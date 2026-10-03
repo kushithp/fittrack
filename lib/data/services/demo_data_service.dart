@@ -3,10 +3,15 @@ import 'package:uuid/uuid.dart';
 import '../models/activity.dart';
 import '../models/activity_log.dart';
 import '../models/daily_note.dart';
+import '../models/exercise.dart';
 import '../models/goal.dart';
+import '../models/personal_record.dart';
 import '../models/sleep_entry.dart';
 import '../models/water_entry.dart';
 import '../models/weight_entry.dart';
+import '../models/workout_exercise.dart';
+import '../models/workout_session.dart';
+import '../models/workout_set.dart';
 import 'database_service.dart';
 
 class DemoDataService {
@@ -123,6 +128,22 @@ class DemoDataService {
     ];
   }
 
+  /// Initial Exercise Catalog.
+  static List<Exercise> get defaultExercises {
+    return [
+      Exercise(id: 'ex_bench', name: 'Bench Press', category: ExerciseCategory.chest),
+      Exercise(id: 'ex_incline_db', name: 'Incline Dumbbell Press', category: ExerciseCategory.chest),
+      Exercise(id: 'ex_cable_fly', name: 'Cable Fly', category: ExerciseCategory.chest),
+      Exercise(id: 'ex_squat', name: 'Barbell Squat', category: ExerciseCategory.legs),
+      Exercise(id: 'ex_deadlift', name: 'Deadlift', category: ExerciseCategory.back),
+      Exercise(id: 'ex_overhead', name: 'Overhead Press', category: ExerciseCategory.shoulders),
+      Exercise(id: 'ex_lat_pulldown', name: 'Lat Pulldown', category: ExerciseCategory.back),
+      Exercise(id: 'ex_db_curl', name: 'Dumbbell Curl', category: ExerciseCategory.biceps),
+      Exercise(id: 'ex_tricep_pushdown', name: 'Tricep Pushdown', category: ExerciseCategory.triceps),
+      Exercise(id: 'ex_run', name: 'Outdoor Running', category: ExerciseCategory.cardio, defaultUnit: 'km'),
+    ];
+  }
+
   /// Initial sample Goals.
   static List<Goal> get defaultGoals {
     final now = DateTime.now();
@@ -178,28 +199,114 @@ class DemoDataService {
     ];
   }
 
-  /// Populates initial demo activities, goals, notes, weight, water, and sleep.
+  /// Initial sample Personal Records.
+  static List<PersonalRecord> get defaultPersonalRecords {
+    final now = DateTime.now();
+    return [
+      PersonalRecord(
+        id: 'pr_1',
+        title: 'Heaviest Bench Press',
+        recordValue: 65.0,
+        unit: 'kg',
+        date: now.subtract(const Duration(days: 2)),
+        category: RecordCategory.exercise,
+        exerciseName: 'Bench Press',
+      ),
+      PersonalRecord(
+        id: 'pr_2',
+        title: 'Highest Squat',
+        recordValue: 100.0,
+        unit: 'kg',
+        date: now.subtract(const Duration(days: 4)),
+        category: RecordCategory.exercise,
+        exerciseName: 'Barbell Squat',
+      ),
+      PersonalRecord(
+        id: 'pr_3',
+        title: 'Highest Deadlift',
+        recordValue: 120.0,
+        unit: 'kg',
+        date: now.subtract(const Duration(days: 6)),
+        category: RecordCategory.exercise,
+        exerciseName: 'Deadlift',
+      ),
+      PersonalRecord(
+        id: 'pr_4',
+        title: 'Longest Workout Session',
+        recordValue: 55.0,
+        unit: 'min',
+        date: now.subtract(const Duration(days: 2)),
+        category: RecordCategory.workout,
+      ),
+    ];
+  }
+
+  /// Populates initial demo activities, exercises, workouts, goals, notes, weight, water, sleep, and PRs.
   static Future<void> populateDemoData(IDatabaseService db) async {
-    final activities = defaultActivities;
-    for (final act in activities) {
+    for (final act in defaultActivities) {
       await db.saveActivity(act);
     }
-
-    final goals = defaultGoals;
-    for (final g in goals) {
+    for (final ex in defaultExercises) {
+      await db.saveExercise(ex);
+    }
+    for (final g in defaultGoals) {
       await db.saveGoal(g);
+    }
+    for (final pr in defaultPersonalRecords) {
+      await db.savePersonalRecord(pr);
     }
 
     final today = DateTime.now();
 
-    // Generate 7 days of sample data
+    // Sample Workout Session: Chest + Triceps
+    final chestTricepsWorkout = WorkoutSession(
+      id: 'ws_chest_triceps_1',
+      title: 'CHEST + TRICEPS',
+      date: today.subtract(const Duration(days: 2)),
+      durationMinutes: 50,
+      notes: 'Felt strong today. Increased bench press by 5kg.',
+      exercises: [
+        WorkoutExercise(
+          exerciseId: 'ex_bench',
+          exerciseName: 'Bench Press',
+          category: ExerciseCategory.chest,
+          sets: [
+            WorkoutSet(setNumber: 1, weightKg: 60.0, reps: 10),
+            WorkoutSet(setNumber: 2, weightKg: 60.0, reps: 8),
+            WorkoutSet(setNumber: 3, weightKg: 65.0, reps: 6),
+          ],
+        ),
+        WorkoutExercise(
+          exerciseId: 'ex_incline_db',
+          exerciseName: 'Incline Dumbbell Press',
+          category: ExerciseCategory.chest,
+          sets: [
+            WorkoutSet(setNumber: 1, weightKg: 22.5, reps: 10),
+            WorkoutSet(setNumber: 2, weightKg: 22.5, reps: 10),
+            WorkoutSet(setNumber: 3, weightKg: 22.5, reps: 8),
+          ],
+        ),
+        WorkoutExercise(
+          exerciseId: 'ex_cable_fly',
+          exerciseName: 'Cable Fly',
+          category: ExerciseCategory.chest,
+          sets: [
+            WorkoutSet(setNumber: 1, weightKg: 15.0, reps: 12),
+            WorkoutSet(setNumber: 2, weightKg: 15.0, reps: 12),
+            WorkoutSet(setNumber: 3, weightKg: 15.0, reps: 12),
+          ],
+        ),
+      ],
+    );
+    await db.saveWorkoutSession(chestTricepsWorkout);
+
+    // Generate 7 days of sample logs
     for (int dayOffset = 6; dayOffset >= 0; dayOffset--) {
       final date = today.subtract(Duration(days: dayOffset));
       final dateKey = ActivityLog.formatDateKey(date);
       final isToday = dayOffset == 0;
 
-      // Activity Logs
-      for (final act in activities) {
+      for (final act in defaultActivities) {
         double val = 0;
         bool completed = false;
 
@@ -253,7 +360,6 @@ class DemoDataService {
         await db.saveActivityLog(log);
       }
 
-      // Water Entries
       await db.saveWaterEntry(WaterEntry(
         id: _uuid.v4(),
         dateKey: dateKey,
@@ -261,7 +367,6 @@ class DemoDataService {
         amountLiters: isToday ? 2.25 : 3.0,
       ));
 
-      // Weight Logs
       await db.saveWeightEntry(WeightEntry(
         id: _uuid.v4(),
         dateKey: dateKey,
@@ -270,7 +375,6 @@ class DemoDataService {
         notes: isToday ? 'Morning weigh in after hydration' : '',
       ));
 
-      // Sleep Logs
       final sleepTime = date.subtract(const Duration(hours: 8));
       await db.saveSleepEntry(SleepEntry(
         id: _uuid.v4(),
@@ -281,7 +385,6 @@ class DemoDataService {
         quality: SleepQuality.good,
       ));
 
-      // Daily Notes
       if (dayOffset % 2 == 0) {
         await db.saveDailyNote(DailyNote(
           id: _uuid.v4(),

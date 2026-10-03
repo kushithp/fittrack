@@ -4,11 +4,14 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../models/activity.dart';
 import '../models/activity_log.dart';
 import '../models/daily_note.dart';
+import '../models/exercise.dart';
 import '../models/goal.dart';
+import '../models/personal_record.dart';
 import '../models/sleep_entry.dart';
 import '../models/user_settings.dart';
 import '../models/water_entry.dart';
 import '../models/weight_entry.dart';
+import '../models/workout_session.dart';
 
 /// Local database contract for FitTrack.
 abstract class IDatabaseService {
@@ -53,6 +56,21 @@ abstract class IDatabaseService {
   Future<void> saveSleepEntry(SleepEntry entry);
   Future<void> deleteSleepEntry(String id);
 
+  // Exercises Library
+  Future<List<Exercise>> getAllExercises();
+  Future<void> saveExercise(Exercise exercise);
+  Future<void> deleteExercise(String id);
+
+  // Workout Sessions
+  Future<List<WorkoutSession>> getAllWorkoutSessions();
+  Future<void> saveWorkoutSession(WorkoutSession session);
+  Future<void> deleteWorkoutSession(String id);
+
+  // Personal Records
+  Future<List<PersonalRecord>> getAllPersonalRecords();
+  Future<void> savePersonalRecord(PersonalRecord record);
+  Future<void> deletePersonalRecord(String id);
+
   // Settings
   Future<UserSettings> getUserSettings();
   Future<void> saveUserSettings(UserSettings settings);
@@ -70,6 +88,9 @@ class LocalDatabaseService implements IDatabaseService {
   static const String _weightKey = 'fittrack_weight_v1';
   static const String _waterKey = 'fittrack_water_v1';
   static const String _sleepKey = 'fittrack_sleep_v1';
+  static const String _exercisesKey = 'fittrack_exercises_v1';
+  static const String _workoutsKey = 'fittrack_workouts_v1';
+  static const String _recordsKey = 'fittrack_records_v1';
   static const String _settingsKey = 'fittrack_settings_v1';
 
   SharedPreferences? _prefs;
@@ -94,8 +115,7 @@ class LocalDatabaseService implements IDatabaseService {
       if (rawJson == null || rawJson.isEmpty) return [];
       final List<dynamic> list = jsonDecode(rawJson);
       return list.map((e) => Activity.fromJson(e as Map<String, dynamic>)).toList();
-    } catch (e, stack) {
-      debugPrint('Error loading activities: $e\n$stack');
+    } catch (e) {
       return [];
     }
   }
@@ -340,6 +360,104 @@ class LocalDatabaseService implements IDatabaseService {
     await _instance.setString(_sleepKey, jsonEncode(list.map((s) => s.toJson()).toList()));
   }
 
+  // --- Exercises Catalog ---
+  @override
+  Future<List<Exercise>> getAllExercises() async {
+    try {
+      final rawJson = _instance.getString(_exercisesKey);
+      if (rawJson == null || rawJson.isEmpty) return [];
+      final List<dynamic> list = jsonDecode(rawJson);
+      return list.map((e) => Exercise.fromJson(e as Map<String, dynamic>)).toList();
+    } catch (e) {
+      return [];
+    }
+  }
+
+  @override
+  Future<void> saveExercise(Exercise exercise) async {
+    final list = await getAllExercises();
+    final index = list.indexWhere((e) => e.id == exercise.id);
+    if (index >= 0) {
+      list[index] = exercise;
+    } else {
+      list.add(exercise);
+    }
+    await _instance.setString(_exercisesKey, jsonEncode(list.map((e) => e.toJson()).toList()));
+  }
+
+  @override
+  Future<void> deleteExercise(String id) async {
+    final list = await getAllExercises();
+    list.removeWhere((e) => e.id == id);
+    await _instance.setString(_exercisesKey, jsonEncode(list.map((e) => e.toJson()).toList()));
+  }
+
+  // --- Workout Sessions ---
+  @override
+  Future<List<WorkoutSession>> getAllWorkoutSessions() async {
+    try {
+      final rawJson = _instance.getString(_workoutsKey);
+      if (rawJson == null || rawJson.isEmpty) return [];
+      final List<dynamic> list = jsonDecode(rawJson);
+      final sessions = list.map((e) => WorkoutSession.fromJson(e as Map<String, dynamic>)).toList();
+      sessions.sort((a, b) => b.date.compareTo(a.date));
+      return sessions;
+    } catch (e) {
+      return [];
+    }
+  }
+
+  @override
+  Future<void> saveWorkoutSession(WorkoutSession session) async {
+    final list = await getAllWorkoutSessions();
+    final index = list.indexWhere((w) => w.id == session.id);
+    if (index >= 0) {
+      list[index] = session;
+    } else {
+      list.add(session);
+    }
+    await _instance.setString(_workoutsKey, jsonEncode(list.map((w) => w.toJson()).toList()));
+  }
+
+  @override
+  Future<void> deleteWorkoutSession(String id) async {
+    final list = await getAllWorkoutSessions();
+    list.removeWhere((w) => w.id == id);
+    await _instance.setString(_workoutsKey, jsonEncode(list.map((w) => w.toJson()).toList()));
+  }
+
+  // --- Personal Records ---
+  @override
+  Future<List<PersonalRecord>> getAllPersonalRecords() async {
+    try {
+      final rawJson = _instance.getString(_recordsKey);
+      if (rawJson == null || rawJson.isEmpty) return [];
+      final List<dynamic> list = jsonDecode(rawJson);
+      return list.map((e) => PersonalRecord.fromJson(e as Map<String, dynamic>)).toList();
+    } catch (e) {
+      return [];
+    }
+  }
+
+  @override
+  Future<void> savePersonalRecord(PersonalRecord record) async {
+    final list = await getAllPersonalRecords();
+    final index = list.indexWhere((r) => r.id == record.id || r.title == record.title);
+    if (index >= 0) {
+      list[index] = record;
+    } else {
+      list.add(record);
+    }
+    await _instance.setString(_recordsKey, jsonEncode(list.map((r) => r.toJson()).toList()));
+  }
+
+  @override
+  Future<void> deletePersonalRecord(String id) async {
+    final list = await getAllPersonalRecords();
+    list.removeWhere((r) => r.id == id);
+    await _instance.setString(_recordsKey, jsonEncode(list.map((r) => r.toJson()).toList()));
+  }
+
   // --- Settings ---
   @override
   Future<UserSettings> getUserSettings() async {
@@ -366,6 +484,9 @@ class LocalDatabaseService implements IDatabaseService {
     await _instance.remove(_weightKey);
     await _instance.remove(_waterKey);
     await _instance.remove(_sleepKey);
+    await _instance.remove(_exercisesKey);
+    await _instance.remove(_workoutsKey);
+    await _instance.remove(_recordsKey);
     await _instance.remove(_settingsKey);
   }
 }

@@ -2,11 +2,14 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:fittrack/data/models/activity.dart';
 import 'package:fittrack/data/models/activity_log.dart';
 import 'package:fittrack/data/models/daily_note.dart';
+import 'package:fittrack/data/models/exercise.dart';
 import 'package:fittrack/data/models/goal.dart';
+import 'package:fittrack/data/models/personal_record.dart';
 import 'package:fittrack/data/models/sleep_entry.dart';
 import 'package:fittrack/data/models/user_settings.dart';
 import 'package:fittrack/data/models/water_entry.dart';
 import 'package:fittrack/data/models/weight_entry.dart';
+import 'package:fittrack/data/models/workout_session.dart';
 import 'package:fittrack/data/repositories/activity_repository.dart';
 import 'package:fittrack/data/services/database_service.dart';
 
@@ -18,20 +21,19 @@ class MockInMemoryDatabaseService implements IDatabaseService {
   final Map<String, WeightEntry> _weight = {};
   final List<WaterEntry> _water = [];
   final Map<String, SleepEntry> _sleep = {};
+  final Map<String, Exercise> _exercises = {};
+  final Map<String, WorkoutSession> _workouts = {};
+  final Map<String, PersonalRecord> _records = {};
   UserSettings _settings = UserSettings();
 
   @override
   Future<void> init() async {}
 
   @override
-  Future<List<Activity>> getAllActivities() async {
-    return _activities.values.toList();
-  }
+  Future<List<Activity>> getAllActivities() async => _activities.values.toList();
 
   @override
-  Future<void> saveActivity(Activity activity) async {
-    _activities[activity.id] = activity;
-  }
+  Future<void> saveActivity(Activity activity) async => _activities[activity.id] = activity;
 
   @override
   Future<void> deleteActivity(String id) async {
@@ -40,24 +42,17 @@ class MockInMemoryDatabaseService implements IDatabaseService {
   }
 
   @override
-  Future<List<ActivityLog>> getAllLogs() async {
-    return _logs.values.toList();
-  }
+  Future<List<ActivityLog>> getAllLogs() async => _logs.values.toList();
 
   @override
-  Future<List<ActivityLog>> getLogsForDate(String dateKey) async {
-    return _logs.values.where((l) => l.dateKey == dateKey).toList();
-  }
+  Future<List<ActivityLog>> getLogsForDate(String dateKey) async =>
+      _logs.values.where((l) => l.dateKey == dateKey).toList();
 
   @override
-  Future<void> saveActivityLog(ActivityLog log) async {
-    _logs[log.id] = log;
-  }
+  Future<void> saveActivityLog(ActivityLog log) async => _logs[log.id] = log;
 
   @override
-  Future<void> deleteActivityLog(String id) async {
-    _logs.remove(id);
-  }
+  Future<void> deleteActivityLog(String id) async => _logs.remove(id);
 
   // --- Goals ---
   @override
@@ -129,6 +124,36 @@ class MockInMemoryDatabaseService implements IDatabaseService {
   @override
   Future<void> deleteSleepEntry(String id) async => _sleep.remove(id);
 
+  // --- Exercises Library ---
+  @override
+  Future<List<Exercise>> getAllExercises() async => _exercises.values.toList();
+
+  @override
+  Future<void> saveExercise(Exercise exercise) async => _exercises[exercise.id] = exercise;
+
+  @override
+  Future<void> deleteExercise(String id) async => _exercises.remove(id);
+
+  // --- Workout Sessions ---
+  @override
+  Future<List<WorkoutSession>> getAllWorkoutSessions() async => _workouts.values.toList();
+
+  @override
+  Future<void> saveWorkoutSession(WorkoutSession session) async => _workouts[session.id] = session;
+
+  @override
+  Future<void> deleteWorkoutSession(String id) async => _workouts.remove(id);
+
+  // --- Personal Records ---
+  @override
+  Future<List<PersonalRecord>> getAllPersonalRecords() async => _records.values.toList();
+
+  @override
+  Future<void> savePersonalRecord(PersonalRecord record) async => _records[record.id] = record;
+
+  @override
+  Future<void> deletePersonalRecord(String id) async => _records.remove(id);
+
   @override
   Future<UserSettings> getUserSettings() async => _settings;
 
@@ -144,6 +169,9 @@ class MockInMemoryDatabaseService implements IDatabaseService {
     _weight.clear();
     _water.clear();
     _sleep.clear();
+    _exercises.clear();
+    _workouts.clear();
+    _records.clear();
   }
 }
 

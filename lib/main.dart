@@ -6,6 +6,7 @@ import 'data/repositories/activity_repository.dart';
 import 'data/repositories/goal_repository.dart';
 import 'data/repositories/health_tracking_repository.dart';
 import 'data/repositories/notes_repository.dart';
+import 'data/repositories/workout_repository.dart';
 import 'data/services/database_service.dart';
 import 'navigation/main_navigation.dart';
 import 'providers/activity_provider.dart';
@@ -13,6 +14,7 @@ import 'providers/goal_provider.dart';
 import 'providers/health_tracking_provider.dart';
 import 'providers/notes_provider.dart';
 import 'providers/theme_provider.dart';
+import 'providers/workout_provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -26,6 +28,7 @@ void main() async {
   final goalRepository = GoalRepository(dbService);
   final notesRepository = NotesRepository(dbService);
   final healthRepository = HealthTrackingRepository(dbService);
+  final workoutRepository = WorkoutRepository(dbService);
 
   runApp(
     MultiProvider(
@@ -44,6 +47,9 @@ void main() async {
         ),
         ChangeNotifierProvider(
           create: (_) => HealthTrackingProvider(healthRepository)..initialize(),
+        ),
+        ChangeNotifierProvider(
+          create: (_) => WorkoutProvider(workoutRepository)..initialize(),
         ),
       ],
       child: const FitTrackApp(),
