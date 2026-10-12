@@ -5,6 +5,7 @@ import 'package:fittrack/data/models/daily_note.dart';
 import 'package:fittrack/data/models/exercise.dart';
 import 'package:fittrack/data/models/goal.dart';
 import 'package:fittrack/data/models/personal_record.dart';
+import 'package:fittrack/data/models/score_config.dart';
 import 'package:fittrack/data/models/sleep_entry.dart';
 import 'package:fittrack/data/models/user_settings.dart';
 import 'package:fittrack/data/models/water_entry.dart';
@@ -24,6 +25,7 @@ class MockInMemoryDatabaseService implements IDatabaseService {
   final Map<String, Exercise> _exercises = {};
   final Map<String, WorkoutSession> _workouts = {};
   final Map<String, PersonalRecord> _records = {};
+  ScoreConfig _scoreConfig = const ScoreConfig();
   UserSettings _settings = UserSettings();
 
   @override
@@ -153,6 +155,13 @@ class MockInMemoryDatabaseService implements IDatabaseService {
 
   @override
   Future<void> deletePersonalRecord(String id) async => _records.remove(id);
+
+  // --- Score Config ---
+  @override
+  Future<ScoreConfig> getScoreConfig() async => _scoreConfig;
+
+  @override
+  Future<void> saveScoreConfig(ScoreConfig config) async => _scoreConfig = config;
 
   @override
   Future<UserSettings> getUserSettings() async => _settings;

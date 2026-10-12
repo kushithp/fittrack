@@ -1,11 +1,13 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:fittrack/main.dart';
 import 'package:fittrack/data/repositories/activity_repository.dart';
+import 'package:fittrack/data/repositories/analytics_repository.dart';
 import 'package:fittrack/data/repositories/goal_repository.dart';
 import 'package:fittrack/data/repositories/health_tracking_repository.dart';
 import 'package:fittrack/data/repositories/notes_repository.dart';
 import 'package:fittrack/data/repositories/workout_repository.dart';
 import 'package:fittrack/providers/activity_provider.dart';
+import 'package:fittrack/providers/analytics_provider.dart';
 import 'package:fittrack/providers/goal_provider.dart';
 import 'package:fittrack/providers/health_tracking_provider.dart';
 import 'package:fittrack/providers/notes_provider.dart';
@@ -22,6 +24,7 @@ void main() {
     final notesRepo = NotesRepository(mockDb);
     final healthRepo = HealthTrackingRepository(mockDb);
     final workoutRepo = WorkoutRepository(mockDb);
+    final analyticsRepo = AnalyticsRepository(mockDb);
 
     await tester.pumpWidget(
       MultiProvider(
@@ -43,6 +46,9 @@ void main() {
           ),
           ChangeNotifierProvider(
             create: (_) => WorkoutProvider(workoutRepo)..initialize(),
+          ),
+          ChangeNotifierProvider(
+            create: (_) => AnalyticsProvider(analyticsRepo, mockDb)..initialize(),
           ),
         ],
         child: const FitTrackApp(),

@@ -7,6 +7,7 @@ import '../models/daily_note.dart';
 import '../models/exercise.dart';
 import '../models/goal.dart';
 import '../models/personal_record.dart';
+import '../models/score_config.dart';
 import '../models/sleep_entry.dart';
 import '../models/user_settings.dart';
 import '../models/water_entry.dart';
@@ -71,6 +72,10 @@ abstract class IDatabaseService {
   Future<void> savePersonalRecord(PersonalRecord record);
   Future<void> deletePersonalRecord(String id);
 
+  // Daily Score Config
+  Future<ScoreConfig> getScoreConfig();
+  Future<void> saveScoreConfig(ScoreConfig config);
+
   // Settings
   Future<UserSettings> getUserSettings();
   Future<void> saveUserSettings(UserSettings settings);
@@ -91,6 +96,7 @@ class LocalDatabaseService implements IDatabaseService {
   static const String _exercisesKey = 'fittrack_exercises_v1';
   static const String _workoutsKey = 'fittrack_workouts_v1';
   static const String _recordsKey = 'fittrack_records_v1';
+  static const String _scoreConfigKey = 'fittrack_score_config_v1';
   static const String _settingsKey = 'fittrack_settings_v1';
 
   SharedPreferences? _prefs;
@@ -360,7 +366,7 @@ class LocalDatabaseService implements IDatabaseService {
     await _instance.setString(_sleepKey, jsonEncode(list.map((s) => s.toJson()).toList()));
   }
 
-  // --- Exercises Catalog ---
+  // --- Exercises Library ---
   @override
   Future<List<Exercise>> getAllExercises() async {
     try {
@@ -458,6 +464,23 @@ class LocalDatabaseService implements IDatabaseService {
     await _instance.setString(_recordsKey, jsonEncode(list.map((r) => r.toJson()).toList()));
   }
 
+  // --- Score Config ---
+  @override
+  Future<ScoreConfig> getScoreConfig() async {
+    try {
+      final rawJson = _instance.getString(_scoreConfigKey);
+      if (rawJson == null || rawJson.isEmpty) return const ScoreConfig();
+      return ScoreConfig.fromJson(jsonDecode(rawJson));
+    } catch (e) {
+      return const ScoreConfig();
+    }
+  }
+
+  @override
+  Future<void> saveScoreConfig(ScoreConfig config) async {
+    await _instance.setString(_scoreConfigKey, jsonEncode(config.toJson()));
+  }
+
   // --- Settings ---
   @override
   Future<UserSettings> getUserSettings() async {
@@ -487,6 +510,7 @@ class LocalDatabaseService implements IDatabaseService {
     await _instance.remove(_exercisesKey);
     await _instance.remove(_workoutsKey);
     await _instance.remove(_recordsKey);
+    await _instance.remove(_scoreConfigKey);
     await _instance.remove(_settingsKey);
   }
 }

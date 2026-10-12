@@ -41,7 +41,6 @@ class _AddEditActivityDialogState extends State<AddEditActivityDialog> {
   @override
   Widget build(BuildContext context) {
     final isEditing = widget.initialActivity != null;
-    final theme = Theme.of(context);
 
     return AlertDialog(
       title: Text(isEditing ? 'Edit Activity' : 'New Activity'),

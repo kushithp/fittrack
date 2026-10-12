@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../../core/utils/formatters.dart';
-import '../../../data/models/exercise.dart';
 import '../../../providers/workout_provider.dart';
 
 class ActiveWorkoutDialog extends StatefulWidget {
