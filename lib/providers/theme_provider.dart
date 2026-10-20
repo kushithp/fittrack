@@ -5,12 +5,14 @@ import '../data/services/database_service.dart';
 class ThemeProvider extends ChangeNotifier {
   final IDatabaseService _db;
   AppThemeMode _themeMode = AppThemeMode.system;
-  String _userName = 'Alex';
+  String _userName = 'Kushith';
+  bool _notificationsEnabled = true;
 
   ThemeProvider(this._db);
 
   AppThemeMode get themeMode => _themeMode;
   String get userName => _userName;
+  bool get notificationsEnabled => _notificationsEnabled;
 
   ThemeMode get flutterThemeMode {
     switch (_themeMode) {
@@ -27,6 +29,7 @@ class ThemeProvider extends ChangeNotifier {
     final settings = await _db.getUserSettings();
     _themeMode = settings.themeMode;
     _userName = settings.userName;
+    _notificationsEnabled = settings.enableNotifications;
     notifyListeners();
   }
 
@@ -42,5 +45,12 @@ class ThemeProvider extends ChangeNotifier {
     notifyListeners();
     final settings = await _db.getUserSettings();
     await _db.saveUserSettings(settings.copyWith(userName: name));
+  }
+
+  Future<void> setNotificationsEnabled(bool enabled) async {
+    _notificationsEnabled = enabled;
+    notifyListeners();
+    final settings = await _db.getUserSettings();
+    await _db.saveUserSettings(settings.copyWith(enableNotifications: enabled));
   }
 }

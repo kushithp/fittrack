@@ -17,36 +17,40 @@ class GreetingHeader extends StatelessWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              '$greeting, ${themeProvider.userName}',
-              style: theme.textTheme.headlineMedium?.copyWith(
-                fontWeight: FontWeight.bold,
-                letterSpacing: -0.5,
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                '$greeting, ${themeProvider.userName}',
+                style: theme.textTheme.headlineMedium?.copyWith(
+                  fontWeight: FontWeight.bold,
+                  letterSpacing: -0.5,
+                ),
+                overflow: TextOverflow.ellipsis,
               ),
-            ),
-            const SizedBox(height: 4),
-            Row(
-              children: [
-                Icon(
-                  Icons.calendar_today_rounded,
-                  size: 16,
-                  color: theme.textTheme.bodyMedium?.color?.withOpacity(0.6),
-                ),
-                const SizedBox(width: 6),
-                Text(
-                  dateStr,
-                  style: theme.textTheme.bodyMedium?.copyWith(
-                    fontWeight: FontWeight.w500,
-                    color: theme.textTheme.bodyMedium?.color?.withOpacity(0.7),
+              const SizedBox(height: 4),
+              Row(
+                children: [
+                  Icon(
+                    Icons.calendar_today_rounded,
+                    size: 16,
+                    color: theme.textTheme.bodyMedium?.color?.withValues(alpha: 0.6),
                   ),
-                ),
-              ],
-            ),
-          ],
+                  const SizedBox(width: 6),
+                  Text(
+                    dateStr,
+                    style: theme.textTheme.bodyMedium?.copyWith(
+                      fontWeight: FontWeight.w500,
+                      color: theme.textTheme.bodyMedium?.color?.withValues(alpha: 0.7),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
         ),
+        const SizedBox(width: 8),
         IconButton.filledTonal(
           icon: Icon(
             themeProvider.themeMode == AppThemeMode.dark

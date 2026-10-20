@@ -21,6 +21,8 @@ class ActivityProvider extends ChangeNotifier {
   List<Activity> get activities => _activities;
   List<Activity> get enabledActivities => _activities.where((a) => a.isEnabled).toList();
   List<Activity> get checklistActivities => _activities.where((a) => a.isEnabled && a.isDailyChecklist).toList();
+  /// Today's logs as a flat list (used by export and other consumers).
+  List<ActivityLog> get todayLogs => _todayLogsMap.values.toList();
   DateTime get selectedDate => _selectedDate;
   double get todayCompletionPercentage => _todayCompletionPercentage;
   bool get isLoading => _isLoading;

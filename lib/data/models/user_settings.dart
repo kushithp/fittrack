@@ -9,7 +9,7 @@ class UserSettings {
   final DateTime? lastBackupDate;
 
   UserSettings({
-    this.userName = 'Alex',
+    this.userName = 'Kushith',
     this.themeMode = AppThemeMode.system,
     this.enableNotifications = true,
     this.hasLoadedDemoData = false,
@@ -44,7 +44,7 @@ class UserSettings {
 
   factory UserSettings.fromJson(Map<String, dynamic> json) {
     return UserSettings(
-      userName: (json['userName'] as String?) ?? 'Alex',
+      userName: (json['userName'] as String?) ?? 'Kushith',
       themeMode: AppThemeMode.values.firstWhere(
         (e) => e.name == json['themeMode'],
         orElse: () => AppThemeMode.system,

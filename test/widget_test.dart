@@ -5,12 +5,15 @@ import 'package:fittrack/data/repositories/analytics_repository.dart';
 import 'package:fittrack/data/repositories/goal_repository.dart';
 import 'package:fittrack/data/repositories/health_tracking_repository.dart';
 import 'package:fittrack/data/repositories/notes_repository.dart';
+import 'package:fittrack/data/repositories/reminder_repository.dart';
 import 'package:fittrack/data/repositories/workout_repository.dart';
+import 'package:fittrack/data/services/notification_service.dart';
 import 'package:fittrack/providers/activity_provider.dart';
 import 'package:fittrack/providers/analytics_provider.dart';
 import 'package:fittrack/providers/goal_provider.dart';
 import 'package:fittrack/providers/health_tracking_provider.dart';
 import 'package:fittrack/providers/notes_provider.dart';
+import 'package:fittrack/providers/reminder_provider.dart';
 import 'package:fittrack/providers/theme_provider.dart';
 import 'package:fittrack/providers/workout_provider.dart';
 import 'package:provider/provider.dart';
@@ -49,6 +52,9 @@ void main() {
           ),
           ChangeNotifierProvider(
             create: (_) => AnalyticsProvider(analyticsRepo, mockDb)..initialize(),
+          ),
+          ChangeNotifierProvider(
+            create: (_) => ReminderProvider(ReminderRepository(), NotificationService()),
           ),
         ],
         child: const FitTrackApp(),

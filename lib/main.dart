@@ -7,31 +7,39 @@ import 'data/repositories/analytics_repository.dart';
 import 'data/repositories/goal_repository.dart';
 import 'data/repositories/health_tracking_repository.dart';
 import 'data/repositories/notes_repository.dart';
+import 'data/repositories/reminder_repository.dart';
 import 'data/repositories/workout_repository.dart';
 import 'data/services/database_service.dart';
+import 'data/services/notification_service.dart';
 import 'navigation/main_navigation.dart';
 import 'providers/activity_provider.dart';
 import 'providers/analytics_provider.dart';
 import 'providers/goal_provider.dart';
 import 'providers/health_tracking_provider.dart';
 import 'providers/notes_provider.dart';
+import 'providers/reminder_provider.dart';
 import 'providers/theme_provider.dart';
 import 'providers/workout_provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // Initialize Local Database Service
+  // Initialize notification service (no-op on Windows/Web).
+  final notificationService = NotificationService();
+  await notificationService.initialize();
+
+  // Initialize Local Database Service.
   final dbService = LocalDatabaseService();
   await dbService.init();
 
-  // Initialize Repositories
+  // Initialize Repositories.
   final activityRepository = ActivityRepository(dbService);
   final goalRepository = GoalRepository(dbService);
   final notesRepository = NotesRepository(dbService);
   final healthRepository = HealthTrackingRepository(dbService);
   final workoutRepository = WorkoutRepository(dbService);
   final analyticsRepository = AnalyticsRepository(dbService);
+  final reminderRepository = ReminderRepository();
 
   runApp(
     MultiProvider(
@@ -56,6 +64,10 @@ void main() async {
         ),
         ChangeNotifierProvider(
           create: (_) => AnalyticsProvider(analyticsRepository, dbService)..initialize(),
+        ),
+        // Stage 5: Reminders provider.
+        ChangeNotifierProvider(
+          create: (_) => ReminderProvider(reminderRepository, notificationService)..loadReminders(),
         ),
       ],
       child: const FitTrackApp(),
