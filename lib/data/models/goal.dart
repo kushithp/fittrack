@@ -48,7 +48,7 @@ class Goal {
     int? colorValue,
     DateTime? createdAt,
     DateTime? updatedAt,
-  })  : colorValue = colorValue ?? const Color(0xFF00B4D8).value,
+  })  : colorValue = colorValue ?? const Color(0xFF00B4D8).toARGB32(),
         createdAt = createdAt ?? DateTime.now(),
         updatedAt = updatedAt ?? DateTime.now();
 

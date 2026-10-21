@@ -57,7 +57,7 @@ class _AddEditExerciseDialogState extends State<AddEditExerciseDialog> {
                 ),
                 const SizedBox(height: 14),
                 DropdownButtonFormField<ExerciseCategory>(
-                  value: _category,
+                  initialValue: _category,
                   decoration: InputDecoration(
                     labelText: 'Category',
                     border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),

@@ -73,7 +73,7 @@ class ActivityTile extends StatelessWidget {
                           Container(
                             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                             decoration: BoxDecoration(
-                              color: activity.category.defaultColor.withOpacity(0.1),
+                              color: activity.category.defaultColor.withValues(alpha: 0.1),
                               borderRadius: BorderRadius.circular(8),
                             ),
                             child: Text(
@@ -91,7 +91,7 @@ class ActivityTile extends StatelessWidget {
                       Text(
                         '${Formatters.formatValue(currentVal)} / ${Formatters.formatValue(targetVal)} ${activity.unit.symbol}',
                         style: theme.textTheme.bodyMedium?.copyWith(
-                          color: theme.textTheme.bodyMedium?.color?.withOpacity(0.7),
+                          color: theme.textTheme.bodyMedium?.color?.withValues(alpha: 0.7),
                         ),
                       ),
                     ],
@@ -137,7 +137,7 @@ class ActivityTile extends StatelessWidget {
                     child: LinearProgressIndicator(
                       value: percent / 100.0,
                       minHeight: 8,
-                      backgroundColor: activity.color.withOpacity(0.15),
+                      backgroundColor: activity.color.withValues(alpha: 0.15),
                       valueColor: AlwaysStoppedAnimation<Color>(
                         isDone ? Colors.green : activity.color,
                       ),

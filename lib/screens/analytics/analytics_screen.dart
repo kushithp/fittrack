@@ -68,7 +68,7 @@ class AnalyticsScreen extends StatelessWidget {
 
               // Metric Selector Dropdown
               DropdownButtonFormField<AnalyticsMetric>(
-                value: analyticsProvider.selectedMetric,
+                initialValue: analyticsProvider.selectedMetric,
                 decoration: InputDecoration(
                   labelText: 'Select Chart Metric',
                   border: OutlineInputBorder(borderRadius: BorderRadius.circular(14)),

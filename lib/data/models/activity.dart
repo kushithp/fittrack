@@ -86,11 +86,12 @@ class Activity {
     DateTime? createdAt,
     DateTime? updatedAt,
   })  : iconCodePoint = iconCodePoint ?? category.icon.codePoint,
-        colorValue = colorValue ?? category.defaultColor.value,
+        colorValue = colorValue ?? category.defaultColor.toARGB32(),
         createdAt = createdAt ?? DateTime.now(),
         updatedAt = updatedAt ?? DateTime.now();
 
   /// Utility to get IconData from stored codePoint
+  // ignore: non_const_argument_for_const_parameter
   IconData get iconData => IconData(iconCodePoint, fontFamily: 'MaterialIcons');
 
   /// Utility to get Color object

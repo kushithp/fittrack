@@ -105,7 +105,7 @@ class _AddEditActivityDialogState extends State<AddEditActivityDialog> {
                     Expanded(
                       flex: 3,
                       child: DropdownButtonFormField<ActivityUnit>(
-                        value: _unit,
+                        initialValue: _unit,
                         decoration: InputDecoration(
                           labelText: 'Unit',
                           border: OutlineInputBorder(
@@ -125,7 +125,7 @@ class _AddEditActivityDialogState extends State<AddEditActivityDialog> {
                 ),
                 const SizedBox(height: 14),
                 DropdownButtonFormField<ActivityCategory>(
-                  value: _category,
+                  initialValue: _category,
                   decoration: InputDecoration(
                     labelText: 'Category',
                     border: OutlineInputBorder(

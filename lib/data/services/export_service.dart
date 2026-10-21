@@ -28,7 +28,7 @@ class ExportService {
             l.activityId,
             l.value.toString(),
             l.isCompleted ? 'Yes' : 'No',
-            l.notes ?? '',
+            l.notes,
           ]),
     ];
 
@@ -44,7 +44,7 @@ class ExportService {
       ...entries.map((e) => [
             e.dateKey,
             e.weightKg.toStringAsFixed(1),
-            e.notes ?? '',
+            e.notes,
           ]),
     ];
 
@@ -78,7 +78,7 @@ class ExportService {
             e.sleepTime.toIso8601String(),
             e.wakeTime.toIso8601String(),
             e.durationHours.toStringAsFixed(1),
-            e.quality?.toString() ?? '',
+            e.quality.toString(),
           ]),
     ];
 

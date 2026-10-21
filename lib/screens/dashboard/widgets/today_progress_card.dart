@@ -30,7 +30,7 @@ class TodayProgressCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(24),
         boxShadow: [
           BoxShadow(
-            color: theme.colorScheme.primary.withOpacity(0.3),
+            color: theme.colorScheme.primary.withValues(alpha: 0.3),
             blurRadius: 16,
             offset: const Offset(0, 8),
           ),
@@ -45,7 +45,7 @@ class TodayProgressCard extends StatelessWidget {
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                   decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.2),
+                    color: Colors.white.withValues(alpha: 0.2),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: const Text(
@@ -62,7 +62,7 @@ class TodayProgressCard extends StatelessWidget {
                 Text(
                   "Today's Progress",
                   style: theme.textTheme.titleMedium?.copyWith(
-                    color: Colors.white.withOpacity(0.9),
+                    color: Colors.white.withValues(alpha: 0.9),
                     fontWeight: FontWeight.w500,
                   ),
                 ),
@@ -81,7 +81,7 @@ class TodayProgressCard extends StatelessWidget {
                   child: LinearProgressIndicator(
                     value: progressRatio,
                     minHeight: 8,
-                    backgroundColor: Colors.white.withOpacity(0.25),
+                    backgroundColor: Colors.white.withValues(alpha: 0.25),
                     valueColor: const AlwaysStoppedAnimation<Color>(Colors.white),
                   ),
                 ),
@@ -98,7 +98,7 @@ class TodayProgressCard extends StatelessWidget {
                 CircularProgressIndicator(
                   value: progressRatio,
                   strokeWidth: 8,
-                  backgroundColor: Colors.white.withOpacity(0.25),
+                  backgroundColor: Colors.white.withValues(alpha: 0.25),
                   valueColor: const AlwaysStoppedAnimation<Color>(Colors.white),
                 ),
                 Center(

@@ -12,7 +12,7 @@ class ActiveWorkoutDialog extends StatefulWidget {
 
 class _ActiveWorkoutDialogState extends State<ActiveWorkoutDialog> {
   final _notesController = TextEditingController();
-  int _durationMinutes = 45;
+  final int _durationMinutes = 45;
 
   @override
   Widget build(BuildContext context) {

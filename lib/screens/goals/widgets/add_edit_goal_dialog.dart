@@ -101,7 +101,7 @@ class _AddEditGoalDialogState extends State<AddEditGoalDialog> {
                     Expanded(
                       flex: 3,
                       child: DropdownButtonFormField<ActivityUnit>(
-                        value: _unit,
+                        initialValue: _unit,
                         decoration: InputDecoration(
                           labelText: 'Unit',
                           border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
@@ -119,7 +119,7 @@ class _AddEditGoalDialogState extends State<AddEditGoalDialog> {
                   children: [
                     Expanded(
                       child: DropdownButtonFormField<GoalTimePeriod>(
-                        value: _timePeriod,
+                        initialValue: _timePeriod,
                         decoration: InputDecoration(
                           labelText: 'Time Period',
                           border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
