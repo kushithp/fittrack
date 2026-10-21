@@ -26,6 +26,8 @@ FitTrack is a Flutter application for organizing everyday fitness and wellness t
 - **Personal records** — keep track of fitness milestones.
 - **Analytics** — view progress charts, daily scores, streaks, and activity history.
 - **Daily notes** — add notes to reflect on your day.
+- **Reminders & notifications** — schedule one-time, daily, or weekly reminders.
+- **Data export** — export activities, workouts, and weight logs to CSV.
 - **Theme preferences** — switch between light and dark appearance.
 - **Local persistence** — app data is stored on the device using `SharedPreferences` and JSON serialization.
 
@@ -38,6 +40,8 @@ FitTrack is a Flutter application for organizing everyday fitness and wellness t
 | [Provider](https://pub.dev/packages/provider) | State management |
 | [SharedPreferences](https://pub.dev/packages/shared_preferences) | Local key-value persistence |
 | [fl_chart](https://pub.dev/packages/fl_chart) | Charts and analytics |
+| [flutter_local_notifications](https://pub.dev/packages/flutter_local_notifications) | Local scheduled reminders |
+| [csv](https://pub.dev/packages/csv) | Data export |
 | [Google Fonts](https://pub.dev/packages/google_fonts) | Typography |
 | [intl](https://pub.dev/packages/intl) | Date and number formatting |
 | [UUID](https://pub.dev/packages/uuid) | Unique identifiers |
