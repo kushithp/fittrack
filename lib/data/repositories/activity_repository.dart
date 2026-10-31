@@ -1,6 +1,7 @@
 import 'package:uuid/uuid.dart';
 import '../models/activity.dart';
 import '../models/activity_log.dart';
+import '../models/personal_record.dart';
 import '../services/database_service.dart';
 
 class ActivityRepository {
@@ -70,7 +71,71 @@ class ActivityRepository {
     );
 
     await _db.saveActivityLog(updatedLog);
+    await _checkAndUpdateActivityPR(activity, value, date);
     return updatedLog;
+  }
+
+  /// Evaluates activity progress for new endurance / cardio personal records
+  Future<void> _checkAndUpdateActivityPR(Activity activity, double value, DateTime date) async {
+    if (value <= 0) return;
+
+    if (activity.unit == ActivityUnit.steps) {
+      const prTitle = 'Highest Daily Steps';
+      final existingRecords = await _db.getAllPersonalRecords();
+      final existing = existingRecords.where((r) => r.title == prTitle);
+      if (existing.isNotEmpty) {
+        final current = existing.first;
+        if (value > current.recordValue) {
+          await _db.savePersonalRecord(PersonalRecord(
+            id: current.id,
+            title: prTitle,
+            recordValue: value,
+            unit: 'steps',
+            date: date,
+            category: RecordCategory.cardio,
+            exerciseName: activity.name,
+          ));
+        }
+      } else {
+        await _db.savePersonalRecord(PersonalRecord(
+          id: _uuid.v4(),
+          title: prTitle,
+          recordValue: value,
+          unit: 'steps',
+          date: date,
+          category: RecordCategory.cardio,
+          exerciseName: activity.name,
+        ));
+      }
+    } else if (activity.unit == ActivityUnit.km) {
+      const prTitle = 'Longest Distance';
+      final existingRecords = await _db.getAllPersonalRecords();
+      final existing = existingRecords.where((r) => r.title == prTitle);
+      if (existing.isNotEmpty) {
+        final current = existing.first;
+        if (value > current.recordValue) {
+          await _db.savePersonalRecord(PersonalRecord(
+            id: current.id,
+            title: prTitle,
+            recordValue: value,
+            unit: 'km',
+            date: date,
+            category: RecordCategory.cardio,
+            exerciseName: activity.name,
+          ));
+        }
+      } else {
+        await _db.savePersonalRecord(PersonalRecord(
+          id: _uuid.v4(),
+          title: prTitle,
+          recordValue: value,
+          unit: 'km',
+          date: date,
+          category: RecordCategory.cardio,
+          exerciseName: activity.name,
+        ));
+      }
+    }
   }
 
   /// Toggle checkbox completion status for an activity

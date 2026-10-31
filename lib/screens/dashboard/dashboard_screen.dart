@@ -3,8 +3,11 @@ import 'package:provider/provider.dart';
 import '../../data/models/activity.dart';
 import '../../providers/activity_provider.dart';
 import '../../widgets/empty_state.dart';
+import 'widgets/active_goals_spotlight.dart';
+import 'widgets/dashboard_quick_hub.dart';
 import 'widgets/greeting_header.dart';
 import 'widgets/stat_card.dart';
+import 'widgets/today_note_spotlight.dart';
 import 'widgets/today_progress_card.dart';
 
 class DashboardScreen extends StatelessWidget {
@@ -47,6 +50,8 @@ class DashboardScreen extends StatelessWidget {
                 TodayProgressCard(
                   percentage: activityProvider.todayCompletionPercentage,
                 ),
+                const SizedBox(height: 24),
+                const DashboardQuickHub(),
                 const SizedBox(height: 24),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -105,6 +110,8 @@ class DashboardScreen extends StatelessWidget {
                       );
                     },
                   ),
+                const SizedBox(height: 24),
+                const ActiveGoalsSpotlight(),
                 const SizedBox(height: 24),
                 Text(
                   "Today's Checklist",
@@ -168,6 +175,9 @@ class DashboardScreen extends StatelessWidget {
                     );
                   },
                 ),
+                const SizedBox(height: 24),
+                const TodayNoteSpotlight(),
+                const SizedBox(height: 16),
               ],
             ),
           ),

@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart';
+import '../data/models/activity_log.dart';
 import '../data/models/daily_note.dart';
 import '../data/repositories/notes_repository.dart';
 
@@ -17,6 +18,13 @@ class NotesProvider extends ChangeNotifier {
   String? get selectedTag => _selectedTag;
   bool get isLoading => _isLoading;
   String? get errorMessage => _errorMessage;
+
+  /// Returns note logged for today if any
+  DailyNote? get todayNote {
+    final todayKey = ActivityLog.formatDateKey(DateTime.now());
+    final matches = _notes.where((n) => n.dateKey == todayKey);
+    return matches.isNotEmpty ? matches.first : null;
+  }
 
   List<String> get availableTags {
     final set = <String>{};
