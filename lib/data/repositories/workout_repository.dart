@@ -2,6 +2,7 @@ import 'package:uuid/uuid.dart';
 import '../models/exercise.dart';
 import '../models/personal_record.dart';
 import '../models/workout_session.dart';
+import '../models/workout_template.dart';
 import '../services/database_service.dart';
 
 class WorkoutRepository {
@@ -44,6 +45,23 @@ class WorkoutRepository {
 
   Future<void> deleteWorkoutSession(String id) async {
     await _db.deleteWorkoutSession(id);
+  }
+
+  // --- Workout Templates / Routines ---
+  Future<List<WorkoutTemplate>> getAllWorkoutTemplates() async {
+    return await _db.getAllWorkoutTemplates();
+  }
+
+  Future<WorkoutTemplate> saveWorkoutTemplate(WorkoutTemplate template) async {
+    final toSave = template.id.isEmpty
+        ? template.copyWith(id: _uuid.v4(), createdAt: DateTime.now())
+        : template.copyWith(updatedAt: DateTime.now());
+    await _db.saveWorkoutTemplate(toSave);
+    return toSave;
+  }
+
+  Future<void> deleteWorkoutTemplate(String id) async {
+    await _db.deleteWorkoutTemplate(id);
   }
 
   // --- Personal Records ---

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../../core/utils/formatters.dart';
 import '../../../providers/workout_provider.dart';
+import 'rest_timer_widget.dart';
 
 class ActiveWorkoutDialog extends StatefulWidget {
   const ActiveWorkoutDialog({super.key});
@@ -13,6 +14,7 @@ class ActiveWorkoutDialog extends StatefulWidget {
 class _ActiveWorkoutDialogState extends State<ActiveWorkoutDialog> {
   final _notesController = TextEditingController();
   final int _durationMinutes = 45;
+  bool _showRestTimer = false;
 
   @override
   Widget build(BuildContext context) {
@@ -27,6 +29,14 @@ class _ActiveWorkoutDialogState extends State<ActiveWorkoutDialog> {
         appBar: AppBar(
           title: Text('Active Workout: ${active.title}'),
           actions: [
+            IconButton(
+              icon: Icon(
+                Icons.timer_rounded,
+                color: _showRestTimer ? theme.colorScheme.primary : null,
+              ),
+              tooltip: 'Rest Timer',
+              onPressed: () => setState(() => _showRestTimer = !_showRestTimer),
+            ),
             TextButton.icon(
               onPressed: () {
                 workoutProvider.finishWorkout(
@@ -60,6 +70,11 @@ class _ActiveWorkoutDialogState extends State<ActiveWorkoutDialog> {
                   ],
                 ),
               ),
+              if (_showRestTimer)
+                RestTimerWidget(
+                  initialSeconds: 90,
+                  onDismiss: () => setState(() => _showRestTimer = false),
+                ),
               Expanded(
                 child: active.exercises.isEmpty
                     ? Center(
@@ -93,40 +108,73 @@ class _ActiveWorkoutDialogState extends State<ActiveWorkoutDialog> {
                                   Row(
                                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                     children: [
-                                      Text(ex.exerciseName, style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
+                                      Expanded(
+                                        child: Text(
+                                          ex.exerciseName,
+                                          style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+                                        ),
+                                      ),
                                       TextButton.icon(
                                         onPressed: () => workoutProvider.addSetToExercise(exIdx),
                                         icon: const Icon(Icons.add_rounded, size: 16),
                                         label: const Text('Add Set'),
+                                      ),
+                                      IconButton(
+                                        icon: const Icon(Icons.close_rounded, size: 18),
+                                        tooltip: 'Remove exercise',
+                                        onPressed: () => workoutProvider.removeExerciseFromActiveWorkout(exIdx),
                                       ),
                                     ],
                                   ),
                                   const SizedBox(height: 10),
                                   ...List.generate(ex.sets.length, (setIdx) {
                                     final set = ex.sets[setIdx];
-                                    return Padding(
-                                      padding: const EdgeInsets.only(bottom: 8.0),
+                                    return Container(
+                                      margin: const EdgeInsets.only(bottom: 8.0),
+                                      padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+                                      decoration: BoxDecoration(
+                                        color: set.isCompleted
+                                            ? Colors.green.withValues(alpha: 0.1)
+                                            : null,
+                                        borderRadius: BorderRadius.circular(8),
+                                      ),
                                       child: Row(
                                         children: [
-                                          Text('Set ${set.setNumber}:', style: const TextStyle(fontWeight: FontWeight.bold)),
-                                          const SizedBox(width: 12),
+                                          IconButton(
+                                            icon: Icon(
+                                              set.isCompleted
+                                                  ? Icons.check_circle_rounded
+                                                  : Icons.radio_button_unchecked_rounded,
+                                              color: set.isCompleted ? Colors.green : Colors.grey,
+                                              size: 20,
+                                            ),
+                                            tooltip: set.isCompleted ? 'Mark incomplete' : 'Mark done & rest',
+                                            onPressed: () {
+                                              workoutProvider.toggleSetCompleted(exIdx, setIdx);
+                                              if (!set.isCompleted && !_showRestTimer) {
+                                                setState(() => _showRestTimer = true);
+                                              }
+                                            },
+                                          ),
+                                          Text('Set ${set.setNumber}', style: const TextStyle(fontWeight: FontWeight.bold)),
+                                          const SizedBox(width: 8),
                                           SizedBox(
-                                            width: 80,
+                                            width: 76,
                                             child: TextFormField(
                                               initialValue: set.weightKg.toString(),
                                               keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                                              decoration: const InputDecoration(labelText: 'Weight (kg)', isDense: true),
+                                              decoration: const InputDecoration(labelText: 'Weight', isDense: true),
                                               onChanged: (val) {
                                                 final w = double.tryParse(val) ?? set.weightKg;
                                                 workoutProvider.updateSet(exIdx, setIdx, weightKg: w);
                                               },
                                             ),
                                           ),
-                                          const SizedBox(width: 12),
+                                          const SizedBox(width: 8),
                                           const Text('×'),
-                                          const SizedBox(width: 12),
+                                          const SizedBox(width: 8),
                                           SizedBox(
-                                            width: 70,
+                                            width: 68,
                                             child: TextFormField(
                                               initialValue: set.reps.toString(),
                                               keyboardType: TextInputType.number,
@@ -136,6 +184,12 @@ class _ActiveWorkoutDialogState extends State<ActiveWorkoutDialog> {
                                                 workoutProvider.updateSet(exIdx, setIdx, reps: r);
                                               },
                                             ),
+                                          ),
+                                          const Spacer(),
+                                          IconButton(
+                                            icon: const Icon(Icons.remove_circle_outline_rounded, size: 18),
+                                            tooltip: 'Remove set',
+                                            onPressed: () => workoutProvider.removeSetFromExercise(exIdx, setIdx),
                                           ),
                                         ],
                                       ),

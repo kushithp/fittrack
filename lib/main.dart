@@ -69,6 +69,9 @@ void main() async {
         ChangeNotifierProvider(
           create: (_) => ReminderProvider(reminderRepository, notificationService)..loadReminders(),
         ),
+        // Stage 7: Database & Reminder repositories for backup/restore services.
+        Provider<IDatabaseService>.value(value: dbService),
+        Provider<ReminderRepository>.value(value: reminderRepository),
       ],
       child: const FitTrackApp(),
     ),

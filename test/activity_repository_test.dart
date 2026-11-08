@@ -11,6 +11,7 @@ import 'package:fittrack/data/models/user_settings.dart';
 import 'package:fittrack/data/models/water_entry.dart';
 import 'package:fittrack/data/models/weight_entry.dart';
 import 'package:fittrack/data/models/workout_session.dart';
+import 'package:fittrack/data/models/workout_template.dart';
 import 'package:fittrack/data/repositories/activity_repository.dart';
 import 'package:fittrack/data/services/database_service.dart';
 
@@ -24,6 +25,7 @@ class MockInMemoryDatabaseService implements IDatabaseService {
   final Map<String, SleepEntry> _sleep = {};
   final Map<String, Exercise> _exercises = {};
   final Map<String, WorkoutSession> _workouts = {};
+  final Map<String, WorkoutTemplate> _templates = {};
   final Map<String, PersonalRecord> _records = {};
   ScoreConfig _scoreConfig = const ScoreConfig();
   UserSettings _settings = UserSettings();
@@ -146,6 +148,17 @@ class MockInMemoryDatabaseService implements IDatabaseService {
   @override
   Future<void> deleteWorkoutSession(String id) async => _workouts.remove(id);
 
+  // --- Workout Templates ---
+  @override
+  Future<List<WorkoutTemplate>> getAllWorkoutTemplates() async => _templates.values.toList();
+
+  @override
+  Future<void> saveWorkoutTemplate(WorkoutTemplate template) async =>
+      _templates[template.id] = template;
+
+  @override
+  Future<void> deleteWorkoutTemplate(String id) async => _templates.remove(id);
+
   // --- Personal Records ---
   @override
   Future<List<PersonalRecord>> getAllPersonalRecords() async => _records.values.toList();
@@ -180,6 +193,7 @@ class MockInMemoryDatabaseService implements IDatabaseService {
     _sleep.clear();
     _exercises.clear();
     _workouts.clear();
+    _templates.clear();
     _records.clear();
   }
 }

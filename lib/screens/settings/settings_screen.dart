@@ -1,9 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../data/models/user_settings.dart';
+import '../../data/repositories/reminder_repository.dart';
+import '../../data/services/backup_service.dart';
+import '../../data/services/database_service.dart';
 import '../../data/services/export_service.dart';
 import '../../providers/activity_provider.dart';
+import '../../providers/analytics_provider.dart';
+import '../../providers/goal_provider.dart';
 import '../../providers/health_tracking_provider.dart';
+import '../../providers/notes_provider.dart';
+import '../../providers/reminder_provider.dart';
 import '../../providers/theme_provider.dart';
 import '../../providers/workout_provider.dart';
 import '../reminders/reminders_screen.dart';
@@ -97,8 +104,8 @@ class SettingsScreen extends StatelessWidget {
           ),
           const SizedBox(height: 16),
 
-          // ── Export ─────────────────────────────────────────────────────
-          _sectionLabel(context, 'Export Data'),
+          // ── Export CSV ─────────────────────────────────────────────────
+          _sectionLabel(context, 'Export Data (CSV)'),
           Card(
             child: Column(
               children: [
@@ -121,6 +128,31 @@ class SettingsScreen extends StatelessWidget {
                   title: const Text('Export Weight Log'),
                   subtitle: const Text('Save as CSV to Documents folder'),
                   onTap: () => _exportData(context, 'weight'),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 16),
+
+          // ── Full Backup & Restore (JSON) ───────────────────────────────
+          _sectionLabel(context, 'Full System Backup & Restore'),
+          Card(
+            child: Column(
+              children: [
+                ListTile(
+                  leading: const Icon(Icons.backup_rounded, color: Colors.blueAccent),
+                  title: const Text('Create Full Backup (JSON)'),
+                  subtitle: const Text('Saves all 12+ entities: routines, workouts, goals, metrics'),
+                  trailing: const Icon(Icons.chevron_right_rounded),
+                  onTap: () => _createFullBackup(context),
+                ),
+                const Divider(height: 1),
+                ListTile(
+                  leading: const Icon(Icons.settings_backup_restore_rounded, color: Colors.teal),
+                  title: const Text('Restore Full Backup (JSON)'),
+                  subtitle: const Text('Import and restore all fitness records from JSON'),
+                  trailing: const Icon(Icons.chevron_right_rounded),
+                  onTap: () => _showRestoreDialog(context),
                 ),
               ],
             ),
@@ -160,7 +192,7 @@ class SettingsScreen extends StatelessWidget {
           // ── Version footer ─────────────────────────────────────────────
           Center(
             child: Text(
-              'FitTrack v1.5.0 • Stage 5',
+              'FitTrack v1.7.0 • Stage 7',
               style: theme.textTheme.bodySmall?.copyWith(
                 color: theme.colorScheme.onSurface.withValues(alpha: 0.4),
               ),
@@ -219,12 +251,139 @@ class SettingsScreen extends StatelessWidget {
     );
   }
 
+  Future<void> _createFullBackup(BuildContext context) async {
+    final dbService = context.read<IDatabaseService>();
+    final reminderRepo = context.read<ReminderRepository>();
+    final backupService = BackupService();
+
+    try {
+      final path = await backupService.exportBackupToFile(dbService, reminderRepo);
+      if (context.mounted) {
+        if (path != null) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Full JSON Backup saved to:\n$path'),
+              duration: const Duration(seconds: 5),
+              action: SnackBarAction(label: 'OK', onPressed: () {}),
+            ),
+          );
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Export not supported on this platform.')),
+          );
+        }
+      }
+    } catch (e) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Backup failed: $e')),
+        );
+      }
+    }
+  }
+
+  void _showRestoreDialog(BuildContext context) {
+    final jsonController = TextEditingController();
+
+    showDialog(
+      context: context,
+      builder: (dialogCtx) => AlertDialog(
+        title: const Text('Restore Full Backup'),
+        content: SizedBox(
+          width: 500,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text(
+                'Paste the raw JSON content of your exported FitTrack backup below:',
+                style: TextStyle(fontSize: 13),
+              ),
+              const SizedBox(height: 12),
+              TextField(
+                controller: jsonController,
+                maxLines: 8,
+                decoration: const InputDecoration(
+                  hintText: '{\n  "appName": "FitTrack",\n  "data": { ... }\n}',
+                  border: OutlineInputBorder(),
+                ),
+              ),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogCtx),
+            child: const Text('Cancel'),
+          ),
+          FilledButton(
+            onPressed: () async {
+              final content = jsonController.text.trim();
+              if (content.isEmpty) return;
+
+              final dbService = context.read<IDatabaseService>();
+              final reminderRepo = context.read<ReminderRepository>();
+              final backupService = BackupService();
+
+              try {
+                final count = await backupService.restoreBackupFromJson(
+                  dbService,
+                  content,
+                  reminderRepo,
+                );
+
+                // Reload all data providers so UI immediately updates
+                if (context.mounted) {
+                  await context.read<ActivityProvider>().initialize();
+                  if (context.mounted) {
+                    await context.read<WorkoutProvider>().initialize();
+                  }
+                  if (context.mounted) {
+                    await context.read<GoalProvider>().initialize();
+                  }
+                  if (context.mounted) {
+                    await context.read<NotesProvider>().initialize();
+                  }
+                  if (context.mounted) {
+                    await context.read<HealthTrackingProvider>().initialize();
+                  }
+                  if (context.mounted) {
+                    await context.read<ReminderProvider>().loadReminders();
+                  }
+                  if (context.mounted) {
+                    await context.read<AnalyticsProvider>().initialize();
+                  }
+
+                  Navigator.pop(dialogCtx);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('Successfully restored $count items from backup!'),
+                      backgroundColor: Colors.green,
+                    ),
+                  );
+                }
+              } catch (e) {
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('Restore failed: $e'),
+                      backgroundColor: Colors.red,
+                    ),
+                  );
+                }
+              }
+            },
+            child: const Text('Restore All Data'),
+          ),
+        ],
+      ),
+    );
+  }
+
   Future<void> _exportData(BuildContext context, String type) async {
     final service = ExportService();
     String? path;
 
-    // Grab the needed provider data.
-    // We use context.read since this is in a callback, not a build method.
     try {
       switch (type) {
         case 'activity':

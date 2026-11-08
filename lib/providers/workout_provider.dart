@@ -4,6 +4,7 @@ import '../data/models/personal_record.dart';
 import '../data/models/workout_exercise.dart';
 import '../data/models/workout_session.dart';
 import '../data/models/workout_set.dart';
+import '../data/models/workout_template.dart';
 import '../data/repositories/workout_repository.dart';
 
 class WorkoutProvider extends ChangeNotifier {
@@ -12,6 +13,7 @@ class WorkoutProvider extends ChangeNotifier {
   List<Exercise> _exerciseCatalog = [];
   List<WorkoutSession> _workoutHistory = [];
   List<PersonalRecord> _personalRecords = [];
+  List<WorkoutTemplate> _templates = [];
 
   // Active workout session in progress
   WorkoutSession? _activeSession;
@@ -24,6 +26,7 @@ class WorkoutProvider extends ChangeNotifier {
   List<Exercise> get exerciseCatalog => _exerciseCatalog;
   List<WorkoutSession> get workoutHistory => _workoutHistory;
   List<PersonalRecord> get personalRecords => _personalRecords;
+  List<WorkoutTemplate> get templates => _templates;
   WorkoutSession? get activeSession => _activeSession;
   bool get isWorkoutInProgress => _activeSession != null;
   bool get isLoading => _isLoading;
@@ -35,6 +38,7 @@ class WorkoutProvider extends ChangeNotifier {
       _exerciseCatalog = await _repository.getAllExercises();
       _workoutHistory = await _repository.getAllWorkoutSessions();
       _personalRecords = await _repository.getAllPersonalRecords();
+      _templates = await _repository.getAllWorkoutTemplates();
       _errorMessage = null;
     } catch (e) {
       _errorMessage = 'Failed to load workout data: $e';
@@ -80,6 +84,125 @@ class WorkoutProvider extends ChangeNotifier {
       durationMinutes: 0,
       exercises: [],
     );
+    notifyListeners();
+  }
+
+  void startWorkoutFromTemplate(WorkoutTemplate template) {
+    final exercises = template.exercises.map((te) {
+      ExerciseCategory cat = ExerciseCategory.other;
+      final match = _exerciseCatalog.where((e) =>
+          e.id == te.exerciseId ||
+          e.name.toLowerCase() == te.exerciseName.toLowerCase());
+      if (match.isNotEmpty) {
+        cat = match.first.category;
+      }
+      final sets = List.generate(
+        te.defaultSets,
+        (i) => WorkoutSet(
+          setNumber: i + 1,
+          weightKg: te.defaultWeightKg,
+          reps: te.targetReps,
+          isCompleted: false,
+        ),
+      );
+      return WorkoutExercise(
+        exerciseId: te.exerciseId,
+        exerciseName: te.exerciseName,
+        category: cat,
+        sets: sets,
+      );
+    }).toList();
+
+    _activeSession = WorkoutSession(
+      id: '',
+      title: template.title,
+      date: DateTime.now(),
+      durationMinutes: template.estimatedDurationMinutes,
+      exercises: exercises,
+    );
+    notifyListeners();
+  }
+
+  Future<void> saveTemplate(WorkoutTemplate template) async {
+    try {
+      final saved = await _repository.saveWorkoutTemplate(template);
+      final index = _templates.indexWhere((t) => t.id == saved.id);
+      if (index >= 0) {
+        _templates[index] = saved;
+      } else {
+        _templates.add(saved);
+      }
+      notifyListeners();
+    } catch (e) {
+      _errorMessage = 'Failed to save template: $e';
+      notifyListeners();
+    }
+  }
+
+  Future<void> deleteTemplate(String id) async {
+    try {
+      await _repository.deleteWorkoutTemplate(id);
+      _templates.removeWhere((t) => t.id == id);
+      notifyListeners();
+    } catch (e) {
+      _errorMessage = 'Failed to delete template: $e';
+      notifyListeners();
+    }
+  }
+
+  void toggleSetCompleted(int exerciseIndex, int setIndex) {
+    if (_activeSession == null ||
+        exerciseIndex >= _activeSession!.exercises.length) {
+      return;
+    }
+    final ex = _activeSession!.exercises[exerciseIndex];
+    if (setIndex >= ex.sets.length) return;
+
+    final targetSet = ex.sets[setIndex];
+    final updatedSet = targetSet.copyWith(isCompleted: !targetSet.isCompleted);
+    final updatedSets = List<WorkoutSet>.from(ex.sets);
+    updatedSets[setIndex] = updatedSet;
+
+    final updatedExercise = ex.copyWith(sets: updatedSets);
+    final updatedExercises =
+        List<WorkoutExercise>.from(_activeSession!.exercises);
+    updatedExercises[exerciseIndex] = updatedExercise;
+
+    _activeSession = _activeSession!.copyWith(exercises: updatedExercises);
+    notifyListeners();
+  }
+
+  void removeSetFromExercise(int exerciseIndex, int setIndex) {
+    if (_activeSession == null ||
+        exerciseIndex >= _activeSession!.exercises.length) {
+      return;
+    }
+    final ex = _activeSession!.exercises[exerciseIndex];
+    if (setIndex >= ex.sets.length) return;
+
+    final updatedSets = List<WorkoutSet>.from(ex.sets)..removeAt(setIndex);
+    for (int i = 0; i < updatedSets.length; i++) {
+      updatedSets[i] = updatedSets[i].copyWith(setNumber: i + 1);
+    }
+
+    final updatedExercise = ex.copyWith(sets: updatedSets);
+    final updatedExercises =
+        List<WorkoutExercise>.from(_activeSession!.exercises);
+    updatedExercises[exerciseIndex] = updatedExercise;
+
+    _activeSession = _activeSession!.copyWith(exercises: updatedExercises);
+    notifyListeners();
+  }
+
+  void removeExerciseFromActiveWorkout(int exerciseIndex) {
+    if (_activeSession == null ||
+        exerciseIndex >= _activeSession!.exercises.length) {
+      return;
+    }
+    final updatedExercises =
+        List<WorkoutExercise>.from(_activeSession!.exercises)
+          ..removeAt(exerciseIndex);
+    _activeSession = _activeSession!.copyWith(exercises: updatedExercises);
     notifyListeners();
   }
 

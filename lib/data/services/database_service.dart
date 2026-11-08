@@ -12,6 +12,7 @@ import '../models/user_settings.dart';
 import '../models/water_entry.dart';
 import '../models/weight_entry.dart';
 import '../models/workout_session.dart';
+import '../models/workout_template.dart';
 
 /// Local database contract for FitTrack.
 abstract class IDatabaseService {
@@ -66,6 +67,11 @@ abstract class IDatabaseService {
   Future<void> saveWorkoutSession(WorkoutSession session);
   Future<void> deleteWorkoutSession(String id);
 
+  // Workout Templates
+  Future<List<WorkoutTemplate>> getAllWorkoutTemplates();
+  Future<void> saveWorkoutTemplate(WorkoutTemplate template);
+  Future<void> deleteWorkoutTemplate(String id);
+
   // Personal Records
   Future<List<PersonalRecord>> getAllPersonalRecords();
   Future<void> savePersonalRecord(PersonalRecord record);
@@ -94,6 +100,7 @@ class LocalDatabaseService implements IDatabaseService {
   static const String _sleepKey = 'fittrack_sleep_v1';
   static const String _exercisesKey = 'fittrack_exercises_v1';
   static const String _workoutsKey = 'fittrack_workouts_v1';
+  static const String _templatesKey = 'fittrack_templates_v1';
   static const String _recordsKey = 'fittrack_records_v1';
   static const String _scoreConfigKey = 'fittrack_score_config_v1';
   static const String _settingsKey = 'fittrack_settings_v1';
@@ -431,6 +438,38 @@ class LocalDatabaseService implements IDatabaseService {
     await _instance.setString(_workoutsKey, jsonEncode(list.map((w) => w.toJson()).toList()));
   }
 
+  // --- Workout Templates ---
+  @override
+  Future<List<WorkoutTemplate>> getAllWorkoutTemplates() async {
+    try {
+      final rawJson = _instance.getString(_templatesKey);
+      if (rawJson == null || rawJson.isEmpty) return [];
+      final List<dynamic> list = jsonDecode(rawJson);
+      return list.map((e) => WorkoutTemplate.fromJson(e as Map<String, dynamic>)).toList();
+    } catch (e) {
+      return [];
+    }
+  }
+
+  @override
+  Future<void> saveWorkoutTemplate(WorkoutTemplate template) async {
+    final list = await getAllWorkoutTemplates();
+    final index = list.indexWhere((t) => t.id == template.id);
+    if (index >= 0) {
+      list[index] = template;
+    } else {
+      list.add(template);
+    }
+    await _instance.setString(_templatesKey, jsonEncode(list.map((t) => t.toJson()).toList()));
+  }
+
+  @override
+  Future<void> deleteWorkoutTemplate(String id) async {
+    final list = await getAllWorkoutTemplates();
+    list.removeWhere((t) => t.id == id);
+    await _instance.setString(_templatesKey, jsonEncode(list.map((t) => t.toJson()).toList()));
+  }
+
   // --- Personal Records ---
   @override
   Future<List<PersonalRecord>> getAllPersonalRecords() async {
@@ -508,6 +547,7 @@ class LocalDatabaseService implements IDatabaseService {
     await _instance.remove(_sleepKey);
     await _instance.remove(_exercisesKey);
     await _instance.remove(_workoutsKey);
+    await _instance.remove(_templatesKey);
     await _instance.remove(_recordsKey);
     await _instance.remove(_scoreConfigKey);
     await _instance.remove(_settingsKey);

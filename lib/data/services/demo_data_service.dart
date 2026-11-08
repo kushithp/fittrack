@@ -12,6 +12,7 @@ import '../models/weight_entry.dart';
 import '../models/workout_exercise.dart';
 import '../models/workout_session.dart';
 import '../models/workout_set.dart';
+import '../models/workout_template.dart';
 import 'database_service.dart';
 
 class DemoDataService {
@@ -241,6 +242,67 @@ class DemoDataService {
     ];
   }
 
+  /// Initial pre-built workout templates / routines.
+  static List<WorkoutTemplate> get defaultWorkoutTemplates {
+    final now = DateTime.now();
+    return [
+      WorkoutTemplate(
+        id: 'tmpl_chest_triceps',
+        title: 'Chest + Triceps Hypertrophy',
+        description: 'Focus on bench pressing strength and triceps volume',
+        estimatedDurationMinutes: 50,
+        createdAt: now,
+        updatedAt: now,
+        exercises: [
+          TemplateExercise(exerciseId: 'ex_bench', exerciseName: 'Bench Press', defaultSets: 3, targetReps: 8, defaultWeightKg: 60.0),
+          TemplateExercise(exerciseId: 'ex_incline_db', exerciseName: 'Incline Dumbbell Press', defaultSets: 3, targetReps: 10, defaultWeightKg: 22.5),
+          TemplateExercise(exerciseId: 'ex_cable_fly', exerciseName: 'Cable Fly', defaultSets: 3, targetReps: 12, defaultWeightKg: 15.0),
+          TemplateExercise(exerciseId: 'ex_tricep_pushdown', exerciseName: 'Tricep Pushdown', defaultSets: 3, targetReps: 12, defaultWeightKg: 20.0),
+        ],
+      ),
+      WorkoutTemplate(
+        id: 'tmpl_back_biceps',
+        title: 'Back + Biceps Pull Power',
+        description: 'Pulling routine targeting lats, upper back, and biceps',
+        estimatedDurationMinutes: 50,
+        createdAt: now,
+        updatedAt: now,
+        exercises: [
+          TemplateExercise(exerciseId: 'ex_deadlift', exerciseName: 'Deadlift', defaultSets: 3, targetReps: 5, defaultWeightKg: 100.0),
+          TemplateExercise(exerciseId: 'ex_bb_row', exerciseName: 'Barbell Row', defaultSets: 3, targetReps: 8, defaultWeightKg: 50.0),
+          TemplateExercise(exerciseId: 'ex_pullup', exerciseName: 'Pull Ups', defaultSets: 3, targetReps: 8, defaultWeightKg: 0.0),
+          TemplateExercise(exerciseId: 'ex_bicep_curl', exerciseName: 'Bicep Curl', defaultSets: 3, targetReps: 10, defaultWeightKg: 14.0),
+        ],
+      ),
+      WorkoutTemplate(
+        id: 'tmpl_legs_core',
+        title: 'Legs & Core Strength',
+        description: 'Heavy quad and hamstring development with core stability',
+        estimatedDurationMinutes: 45,
+        createdAt: now,
+        updatedAt: now,
+        exercises: [
+          TemplateExercise(exerciseId: 'ex_squat', exerciseName: 'Barbell Squat', defaultSets: 4, targetReps: 6, defaultWeightKg: 80.0),
+          TemplateExercise(exerciseId: 'ex_plank', exerciseName: 'Plank', defaultSets: 3, targetReps: 60, defaultWeightKg: 0.0),
+        ],
+      ),
+      WorkoutTemplate(
+        id: 'tmpl_full_body',
+        title: 'Full Body Foundational',
+        description: 'Compound lifts covering chest, legs, shoulders, and back',
+        estimatedDurationMinutes: 45,
+        createdAt: now,
+        updatedAt: now,
+        exercises: [
+          TemplateExercise(exerciseId: 'ex_squat', exerciseName: 'Barbell Squat', defaultSets: 3, targetReps: 8, defaultWeightKg: 70.0),
+          TemplateExercise(exerciseId: 'ex_bench', exerciseName: 'Bench Press', defaultSets: 3, targetReps: 8, defaultWeightKg: 55.0),
+          TemplateExercise(exerciseId: 'ex_ohp', exerciseName: 'Overhead Shoulder Press', defaultSets: 3, targetReps: 8, defaultWeightKg: 35.0),
+          TemplateExercise(exerciseId: 'ex_bb_row', exerciseName: 'Barbell Row', defaultSets: 3, targetReps: 8, defaultWeightKg: 45.0),
+        ],
+      ),
+    ];
+  }
+
   /// Populates initial demo activities, exercises, workouts, goals, notes, weight, water, sleep, and PRs.
   static Future<void> populateDemoData(IDatabaseService db) async {
     for (final act in defaultActivities) {
@@ -254,6 +316,9 @@ class DemoDataService {
     }
     for (final pr in defaultPersonalRecords) {
       await db.savePersonalRecord(pr);
+    }
+    for (final tmpl in defaultWorkoutTemplates) {
+      await db.saveWorkoutTemplate(tmpl);
     }
 
     final today = DateTime.now();
