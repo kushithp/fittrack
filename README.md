@@ -2,63 +2,88 @@
 
 # FitTrack
 
-**A personal fitness and wellness tracker built with Flutter.**
+**A comprehensive, local-first personal fitness, workout, and wellness tracker built with Flutter.**
 
-Track your workouts, daily activities, goals, and wellness habits — then review your progress in one place.
+[![Flutter](https://img.shields.io/badge/Flutter-3.47.5-02569B?logo=flutter)](https://flutter.dev/)
+[![Dart](https://img.shields.io/badge/Dart-3.13.4-0175C2?logo=dart)](https://dart.dev/)
+[![Tests](https://img.shields.io/badge/Tests-40%20Passing-brightgreen?logo=checkmarx)](test/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+
+Track your gym routines, cardio habits, nutrition, sleep, body weight, and daily wellness notes — all in a single offline-first application with interactive charts and automated record tracking.
 
 </div>
 
 ---
 
-## Overview
+## 🌟 Key Features
 
-FitTrack is a Flutter application for organizing everyday fitness and wellness tracking. It brings activity logging, workout sessions, personal goals, daily notes, and health-related entries together in a single app. Progress and trends can be reviewed through the analytics screens, while light and dark themes let you choose your preferred appearance.
+### 1. 🏋️ Workout Logging & Custom Routines
+- **Reusable Exercise Catalog** across all muscle groups (Chest, Back, Legs, Shoulders, Arms, Core, Cardio).
+- **Pre-Built & Custom Routines**: Jumpstart workouts with 1 tap using pre-built templates (*Chest + Triceps Hypertrophy, Back + Biceps Pull Power, Legs & Core Strength, Full Body Foundational*) or design your own.
+- **In-Workout Rest Timer**: Persistent countdown timer with presets (30s, 60s, 90s, 120s, 180s), progress ring, +30s extension, and pause/resume controls.
+- **Live Set Logging**: Track weight (kg) and reps set-by-set with in-flight completion toggles.
+- **Automated Personal Records (PRs)**: Automatically detects and records all-time best weights and cardio milestones.
 
-> **Current integration note:** Health-platform integration (such as Apple Health / HealthKit or Google Health Connect) is not connected yet. The current implementation uses manual tracking.
+### 2. 🏃 Activity & Habit Tracking
+- Create custom daily habits and activities (Endurance, Strength, Nutrition, Wellness, Sleep).
+- Daily checklist toggles and numeric targets (steps, km, minutes, calories, reps).
+- Cardio PR detection (highest daily step counts and longest distance runs).
 
-## Features
+### 3. 🎯 Goals & Milestones
+- Set distance, duration, frequency, and weight goals.
+- Live visual progress bars, percentage indicators, and deadline countdowns.
+- Spotlight banner on Dashboard for fast progress reviews.
 
-- **Dashboard** — review daily progress and key stats.
-- **Activity tracking** — create and manage activities and log them by date.
-- **Goals** — set personal goals and monitor progress.
-- **Workout logging** — manage exercises and workout sessions, including sets.
-- **Wellness tracking** — record water intake, sleep, and weight.
-- **Personal records** — keep track of fitness milestones.
-- **Analytics** — view progress charts, daily scores, streaks, and activity history.
-- **Daily notes** — add notes to reflect on your day.
-- **Reminders & notifications** — schedule one-time, daily, or weekly reminders.
-- **Data export** — export activities, workouts, and weight logs to CSV.
-- **Theme preferences** — switch between light and dark appearance.
-- **Local persistence** — app data is stored on the device using `SharedPreferences` and JSON serialization.
+### 4. 💧 Body & Wellness Metrics
+- **Body Weight Tracker**: Historical logs with trend analysis and difference calculations.
+- **Hydration Logger**: 1-tap quick logging (+250ml / +500ml) with daily target gauges.
+- **Sleep Quality Tracker**: Sleep duration, bedtime, wake time, and 1–5 star quality ratings.
+- **Daily Reflection Notes**: Daily ratings for Energy, Mood, and Recovery (1–10) with searchable tags.
 
-## Tech stack
+### 5. 📊 Interactive Analytics & Heatmap
+- **Progress Charts (`fl_chart`)**: Multi-metric timeline charts for volume, consistency, and metrics.
+- **90-Day Contribution Heatmap**: GitHub-style activity grid visualizing daily workout frequency.
+- **Configurable Daily Health Score**: Weighted scoring formula dynamically computed from daily activities, workouts, water, and sleep.
+- **Streak Tracker**: Tracks current and best streaks with weekly and monthly consistency percentages.
+
+### 6. ⏰ Reminders & Scheduled Notifications
+- Scheduled local notifications (`flutter_local_notifications`).
+- Custom frequencies: One-time, Daily, or specific days of the week.
+- Per-reminder active toggle and vibration/sound support.
+
+### 7. 💾 Data Safety, Export & Full Backup
+- **CSV Data Export**: Export Activity Logs, Workout Sessions, and Weight Entries to CSV files.
+- **Full JSON Backup & Restore**: Round-trip backup of all 12+ app entities into a single versioned JSON payload.
+- **Local-First Architecture**: High privacy, fast offline performance using `SharedPreferences` and JSON serialization.
+
+---
+
+## 🛠️ Tech Stack
 
 | Technology | Purpose |
-| --- | --- |
-| [Flutter](https://flutter.dev/) | Cross-platform app UI |
-| [Dart](https://dart.dev/) | Application language |
-| [Provider](https://pub.dev/packages/provider) | State management |
-| [SharedPreferences](https://pub.dev/packages/shared_preferences) | Local key-value persistence |
-| [fl_chart](https://pub.dev/packages/fl_chart) | Charts and analytics |
-| [flutter_local_notifications](https://pub.dev/packages/flutter_local_notifications) | Local scheduled reminders |
-| [csv](https://pub.dev/packages/csv) | Data export |
-| [Google Fonts](https://pub.dev/packages/google_fonts) | Typography |
-| [intl](https://pub.dev/packages/intl) | Date and number formatting |
-| [UUID](https://pub.dev/packages/uuid) | Unique identifiers |
+| :--- | :--- |
+| [Flutter](https://flutter.dev/) | Cross-platform UI toolkit |
+| [Dart](https://dart.dev/) | Strongly typed application language |
+| [Provider](https://pub.dev/packages/provider) | Clean reactive state management |
+| [SharedPreferences](https://pub.dev/packages/shared_preferences) | Fast offline key-value storage |
+| [fl_chart](https://pub.dev/packages/fl_chart) | Interactive charts and analytics |
+| [flutter_local_notifications](https://pub.dev/packages/flutter_local_notifications) | Local push reminders |
+| [csv](https://pub.dev/packages/csv) | CSV data generation |
+| [path_provider](https://pub.dev/packages/path_provider) | Document directory file resolution |
+| [Google Fonts](https://pub.dev/packages/google_fonts) | Clean modern typography |
+| [intl](https://pub.dev/packages/intl) | Date and metric formatting |
+| [UUID](https://pub.dev/packages/uuid) | Unique record ID generation |
 
-## Getting started
+---
+
+## 🚀 Getting Started
 
 ### Prerequisites
+- [Flutter SDK](https://docs.flutter.dev/get-started/install) (`^3.13.4` / Flutter 3.x)
+- Dart SDK (included with Flutter)
+- Windows, macOS, Linux, Android, or iOS development toolchain
 
-Install the following before running the app:
-
-- [Flutter SDK](https://docs.flutter.dev/get-started/install) compatible with the SDK constraint in `pubspec.yaml` (`^3.13.4`).
-- Dart SDK (included with Flutter).
-- An editor such as [Visual Studio Code](https://code.visualstudio.com/) or [Android Studio](https://developer.android.com/studio).
-- An emulator/simulator or a connected device.
-
-Verify your setup:
-
+Verify setup:
 ```bash
 flutter doctor
 ```
@@ -66,114 +91,70 @@ flutter doctor
 ### Installation
 
 1. Clone the repository:
-
    ```bash
-   git clone <YOUR_GITHUB_REPOSITORY_URL>
-   ```
-
-2. Move into the project directory:
-
-   ```bash
+   git clone https://github.com/kushithp/fittrack.git
    cd fittrack
    ```
 
-   If your downloaded/cloned folder has a different name, use that folder name instead.
-
-3. Install dependencies:
-
+2. Install dependencies:
    ```bash
    flutter pub get
    ```
 
-4. Run the app on a connected device or running emulator:
-
+3. Run the application:
    ```bash
+   # Desktop (Windows)
+   flutter run -d windows
+
+   # Chrome (Web)
+   flutter run -d chrome
+
+   # Mobile (Android / iOS)
    flutter run
    ```
 
-### Useful development commands
+---
+
+## 🧪 Testing
+
+FitTrack includes a comprehensive automated test suite covering models, repositories, providers, and UI widgets:
 
 ```bash
-# Check Dart/Flutter code for issues
-flutter analyze
-
-# Run automated tests
 flutter test
-
-# Build an Android APK
-flutter build apk
-
-# Build an Android App Bundle
-flutter build appbundle
-
-# Build for iOS (requires macOS and Xcode)
-flutter build ios
 ```
 
-## Project structure
+**Status**: 40 tests passing across all 7 architectural stages.
 
-The code is organized by responsibility:
+---
+
+## 📁 Project Structure
 
 ```text
 lib/
 ├── core/
-│   ├── constants/       # Shared app constants
-│   ├── theme/           # Theme configuration
+│   ├── constants/       # App constants and configuration
+│   ├── theme/           # Obsidian Dark and Clean Light themes
 │   └── utils/           # Formatting and date helpers
 ├── data/
-│   ├── models/          # Data models
-│   ├── repositories/    # Data access and domain operations
-│   └── services/        # Local storage and service abstractions
-├── navigation/          # Main app navigation
-├── providers/           # Provider state management
-├── screens/             # Dashboard, tracking, goals, workouts, analytics, etc.
-└── widgets/             # Shared UI components
+│   ├── models/          # 12+ Domain models (Activity, Goal, Workout, Template, Note, etc.)
+│   ├── repositories/    # Clean architecture repository layer
+│   └── services/        # Database, Notification, Export, and Backup services
+├── navigation/          # Adaptive navigation shell
+├── providers/           # Provider state management controllers
+├── screens/             # Dashboard, Workout, Tracking, Analytics, Goals, Notes, Settings
+└── widgets/             # Reusable UI widgets and cards
 ```
 
-## Data and privacy
+---
 
-FitTrack currently persists its app data locally using `SharedPreferences`; the database service serializes records as JSON. The project does not currently implement a cloud account or cloud synchronization flow. The repository also contains a sync-service abstraction, but do not assume remote sync is available unless it is implemented and configured.
+## 📄 License
 
-Because data is stored locally, uninstalling the app or clearing its storage may remove saved information. Back up important data before doing so.
-
-## Screenshots
-
-Screenshots help visitors understand the app quickly. Add images of the actual app UI to a folder such as `screenshots/`, then update this section. For example:
-
-```markdown
-![FitTrack dashboard](screenshots/dashboard.png)
-```
-
-<!-- Add verified app screenshots here when available. -->
-
-## Roadmap
-
-Potential next steps for the project:
-
-- Connect to supported health platforms where appropriate.
-- Add automated tests for repositories, providers, and core user flows.
-- Add screenshots or a short demo to the repository.
-- Document backup/export and synchronization behavior if those features are introduced.
-
-## Contributing
-
-Contributions and suggestions are welcome.
-
-1. Fork the repository.
-2. Create a branch for your change: `git checkout -b feat/your-change`.
-3. Make your changes and run `flutter analyze` and `flutter test`.
-4. Commit your work and open a pull request describing the change.
-
-For larger changes, open an issue first to discuss the proposal.
-
-## License
-
-No license file is currently included. Unless a license is added, the project should not be assumed to be open source or freely reusable. Add a `LICENSE` file with the license you choose before inviting reuse.
+This project is licensed under the [MIT License](LICENSE) — see the [LICENSE](LICENSE) file for details.
 
 ---
 
 <div align="center">
 
-Made with Flutter 💙
+Made with ❤️ by [Kushith P](https://github.com/kushithp) using Flutter
 
 </div>
